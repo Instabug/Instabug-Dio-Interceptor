@@ -1,5 +1,7 @@
 # Instabug Dio Interceptor
 
+[![CircleCI](https://circleci.com/gh/Instabug/Instabug-Dio-Interceptor.svg?style=svg)](https://circleci.com/gh/Instabug/Instabug-Dio-Interceptor)
+
 This package is an add on to [Instabug-Flutter](https://github.com/Instabug/Instabug-Flutter).
 
 It intercepts any requests performed with `Dio` Package and sends them to the report that will be sent to the dashboard.  
