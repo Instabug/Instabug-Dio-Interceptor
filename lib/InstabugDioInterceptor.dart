@@ -4,17 +4,17 @@ import 'package:dio/dio.dart';
 class InstabugDioInterceptor extends Interceptor { 
   
   @override
-  onRequest(RequestOptions options) {
+  dynamic onRequest(RequestOptions options) {
     print(options);
   }
 
   @override
-  onResponse(Response response) {
+  dynamic onResponse(Response  response) {
     print(response);
   }
 
   @override
-  onError(DioError e) {
-    print(e);
+  dynamic onError(DioError err) {
+    print(err);
   }
 }
