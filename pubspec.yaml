@@ -1,8 +1,8 @@
 name: instabug_dio_interceptor
 description: A new Flutter package project.
 version: 0.0.1
-author:
-homepage:
+author: Instabug <support@instabug.com>
+homepage: https://github.com/Instabug/Instabug-Flutter#readme
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
@@ -10,8 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  dio: 2.1.7
-  instabug:
+  dio: ^2.1.7
+  instabug: ^1.0.0-beta.4
 dev_dependencies:
   flutter_test:
     sdk: flutter
