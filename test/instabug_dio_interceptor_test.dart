@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:mockito/mockito.dart';
-import 'package:instabug_dio_interceptor/InstabugDioInterceptor.dart';
+import 'package:instabug_dio_interceptor/instabug_dio_interceptor.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 
