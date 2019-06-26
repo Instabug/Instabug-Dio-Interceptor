@@ -1,0 +1,17 @@
+version: 2
+jobs:
+   test:
+    docker:
+      - image: cirrusci/flutter
+    steps:
+      - checkout
+      - run: flutter doctor
+      - run: pub get
+      - run: flutter test
+      - run: dartanalyzer --options analysis_options.yaml --fatal-warnings lib
+
+workflows:
+  version: 2
+  build-test:
+    jobs:
+      - test
