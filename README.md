@@ -10,5 +10,5 @@ To enable network logging, simply add the  `InstabugDioInterceptor` to the dio o
 
 ```dart
 var dio = new Dio();
-dio.interceptors.add(InstabugNetworkInterceptor());
+dio.interceptors.add(InstabugDioInterceptor());
 ```
