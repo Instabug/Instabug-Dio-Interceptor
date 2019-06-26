@@ -39,13 +39,12 @@ void main() {
     dio.interceptors.add(instabugDioInterceptor);
     when<dynamic>(instabugDioInterceptor.onRequest(any)).thenReturn(null);
     when<dynamic>(instabugDioInterceptor.onResponse(any)).thenReturn(null);
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 1000; i++) {
       try {
-      await dio.get<dynamic>("http://dummy.restapiexample.com/api/v1/employees");
+       dio.get<dynamic>("http://dummy.restapiexample.com/api/v1/employees");
       } on DioError { }
     }
-     verify<dynamic>(instabugDioInterceptor.onRequest(any)).called(20);
-     verify<dynamic>(instabugDioInterceptor.onResponse(any)).called(20);
+     verify<dynamic>(instabugDioInterceptor.onRequest(any)).called(1000);
   });
 }
 
