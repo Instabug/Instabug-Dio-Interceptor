@@ -2,7 +2,7 @@ name: instabug_dio_interceptor
 description: A new Flutter package project.
 version: 0.0.1
 author: Instabug <support@instabug.com>
-homepage: https://github.com/Instabug/Instabug-Flutter#readme
+homepage: https://github.com/Instabug/Instabug-Flutter#readme 
 
 environment:
   sdk: ">=2.1.0 <3.0.0"

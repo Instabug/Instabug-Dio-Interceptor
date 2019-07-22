@@ -1,6 +1,7 @@
 # Instabug Dio Interceptor
 
 [![CircleCI](https://circleci.com/gh/Instabug/Instabug-Dio-Interceptor.svg?style=svg)](https://circleci.com/gh/Instabug/Instabug-Dio-Interceptor)
+[![pub package](https://img.shields.io/pub/v/instabug_dio_interceptor.svg)](https://pub.dev/packages/instabug_dio_interceptor)
 
 This package is an add on to [Instabug-Flutter](https://github.com/Instabug/Instabug-Flutter).
 
