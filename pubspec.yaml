@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   dio: ^2.1.7
-  instabug: ^1.0.0-beta.4
+  instabug_flutter: ^1.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
