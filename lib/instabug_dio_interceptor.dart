@@ -6,20 +6,23 @@ class InstabugDioInterceptor extends Interceptor {
   static final Map<int, NetworkData> _requests = <int, NetworkData>{};
 
   @override
-  dynamic onRequest(RequestOptions options) {
+  onRequest(RequestOptions options) {
     final NetworkData data = NetworkData();
     data.startTime = DateTime.now();
     _requests[options.hashCode] = data;
+    return super.onRequest(options);
   }
 
   @override
-  dynamic onResponse(Response response) {
+  onResponse(Response response) {
     NetworkLogger.networkLog(_map(response));
+    return super.onResponse(response);
   }
 
   @override
-  dynamic onError(DioError err) {
+  onError(DioError err) {
     NetworkLogger.networkLog(_map(err.response));
+    return super.onError(err);
   }
 
   static NetworkData _getRequestData(int requestHashCode) {
