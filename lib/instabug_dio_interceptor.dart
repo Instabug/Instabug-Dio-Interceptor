@@ -6,20 +6,23 @@ class InstabugDioInterceptor extends Interceptor {
   static final Map<int, NetworkData> _requests = <int, NetworkData>{};
 
   @override
-  dynamic onRequest(RequestOptions options) {
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     final NetworkData data = NetworkData();
     data.startTime = DateTime.now();
     _requests[options.hashCode] = data;
+    handler.next(options);
   }
 
   @override
-  dynamic onResponse(Response response) {
+  void onResponse(Response response, ResponseInterceptorHandler handler) {
     NetworkLogger.networkLog(_map(response));
+    handler.next(response);
   }
 
   @override
-  dynamic onError(DioError err) {
+  void onError(DioError err, ErrorInterceptorHandler handler) {
     NetworkLogger.networkLog(_map(err.response));
+    handler.next(err);
   }
 
   static NetworkData _getRequestData(int requestHashCode) {
@@ -30,17 +33,16 @@ class InstabugDioInterceptor extends Interceptor {
   }
 
   NetworkData _map(Response response) {
-    final NetworkData data = _getRequestData(response.request.hashCode);
+    final NetworkData data = _getRequestData(response.requestOptions.hashCode);
     data.endTime = DateTime.now();
-    data.duration = data.endTime.millisecondsSinceEpoch -
-        data.startTime.millisecondsSinceEpoch;
+    data.duration = data.endTime.millisecondsSinceEpoch - data.startTime.millisecondsSinceEpoch;
     final Map<String, dynamic> responseHeaders = <String, dynamic>{};
-    response.headers.forEach((name, value) => responseHeaders[name] = value);
-    data.url = response.request.uri.toString();
-    data.method = response.request.method;
-    data.requestBody = response.request.data;
-    data.requestHeaders = response.request.headers;
-    data.contentType = response.request.contentType.toString();
+    response.headers.forEach((String name, dynamic value) => responseHeaders[name] = value);
+    data.url = response.requestOptions.uri.toString();
+    data.method = response.requestOptions.method;
+    data.requestBody = response.requestOptions.data;
+    data.requestHeaders = response.requestOptions.headers;
+    data.contentType = response.requestOptions.contentType.toString();
     data.status = response.statusCode;
     data.responseBody = response.data;
     data.responseHeaders = responseHeaders;
