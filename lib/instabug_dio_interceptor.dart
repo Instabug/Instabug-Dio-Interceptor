@@ -7,45 +7,48 @@ class InstabugDioInterceptor extends Interceptor {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    final NetworkData data = NetworkData();
-    data.startTime = DateTime.now();
+    final NetworkData data =
+        NetworkData(startTime: DateTime.now(), url: options.uri.toString(), method: options.method);
     _requests[options.hashCode] = data;
     handler.next(options);
   }
 
   @override
-  void onResponse(Response response, ResponseInterceptorHandler handler) {
+  void onResponse(Response<dynamic> response, ResponseInterceptorHandler handler) {
     NetworkLogger.networkLog(_map(response));
     handler.next(response);
   }
 
   @override
   void onError(DioError err, ErrorInterceptorHandler handler) {
-    NetworkLogger.networkLog(_map(err.response));
+    if (err.response != null) {
+      NetworkLogger.networkLog(_map(err.response!));
+    }
+
     handler.next(err);
   }
 
   static NetworkData _getRequestData(int requestHashCode) {
-    if (_requests[requestHashCode] != null) {
-      return _requests.remove(requestHashCode);
-    }
-    return null;
+    final NetworkData d = _requests[requestHashCode]!;
+    _requests.remove(requestHashCode);
+    return d;
   }
 
-  NetworkData _map(Response response) {
+  NetworkData _map(Response<dynamic> response) {
     final NetworkData data = _getRequestData(response.requestOptions.hashCode);
-    data.endTime = DateTime.now();
-    data.duration = data.endTime.millisecondsSinceEpoch - data.startTime.millisecondsSinceEpoch;
     final Map<String, dynamic> responseHeaders = <String, dynamic>{};
     response.headers.forEach((String name, dynamic value) => responseHeaders[name] = value);
-    data.url = response.requestOptions.uri.toString();
-    data.method = response.requestOptions.method;
-    data.requestBody = response.requestOptions.data;
-    data.requestHeaders = response.requestOptions.headers;
-    data.contentType = response.requestOptions.contentType.toString();
-    data.status = response.statusCode;
-    data.responseBody = response.data;
-    data.responseHeaders = responseHeaders;
-    return data;
+    return data.copyWith(
+      endTime: DateTime.now(),
+      duration: data.endTime!.millisecondsSinceEpoch - data.startTime.millisecondsSinceEpoch,
+      url: response.requestOptions.uri.toString(),
+      method: response.requestOptions.method,
+      requestBody: response.requestOptions.data,
+      requestHeaders: response.requestOptions.headers,
+      contentType: response.requestOptions.contentType,
+      status: response.statusCode,
+      responseBody: response.data,
+      responseHeaders: responseHeaders,
+    );
   }
 }
