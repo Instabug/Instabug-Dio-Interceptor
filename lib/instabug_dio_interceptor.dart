@@ -15,14 +15,16 @@ class InstabugDioInterceptor extends Interceptor {
 
   @override
   void onResponse(Response<dynamic> response, ResponseInterceptorHandler handler) {
-    NetworkLogger.networkLog(_map(response));
+    final NetworkData data = _map(response);
+    NetworkLogger.networkLog(data);
     handler.next(response);
   }
 
   @override
   void onError(DioError err, ErrorInterceptorHandler handler) {
     if (err.response != null) {
-      NetworkLogger.networkLog(_map(err.response!));
+      final NetworkData data = _map(err.response!);
+      NetworkLogger.networkLog(data);
     }
 
     handler.next(err);
@@ -40,7 +42,7 @@ class InstabugDioInterceptor extends Interceptor {
     response.headers.forEach((String name, dynamic value) => responseHeaders[name] = value);
     return data.copyWith(
       endTime: DateTime.now(),
-      duration: data.endTime!.millisecondsSinceEpoch - data.startTime.millisecondsSinceEpoch,
+      duration: data.endTime != null ? data.endTime!.millisecondsSinceEpoch - data.startTime.millisecondsSinceEpoch : 0,
       url: response.requestOptions.uri.toString(),
       method: response.requestOptions.method,
       requestBody: response.requestOptions.data,
