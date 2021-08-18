@@ -45,11 +45,11 @@ class InstabugDioInterceptor extends Interceptor {
       duration: data.endTime != null ? data.endTime!.millisecondsSinceEpoch - data.startTime.millisecondsSinceEpoch : 0,
       url: response.requestOptions.uri.toString(),
       method: response.requestOptions.method,
-      requestBody: response.requestOptions.data,
+      requestBody: response.requestOptions.data.toString(),
       requestHeaders: response.requestOptions.headers,
       contentType: response.requestOptions.contentType,
       status: response.statusCode,
-      responseBody: response.data,
+      responseBody: response.data.toString(),
       responseHeaders: responseHeaders,
     );
   }
