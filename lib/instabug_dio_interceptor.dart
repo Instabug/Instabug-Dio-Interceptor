@@ -1,49 +1,75 @@
 import 'package:dio/dio.dart';
-import 'package:instabug_flutter/models/network_data.dart';
 import 'package:instabug_flutter/NetworkLogger.dart';
+import 'package:instabug_flutter/models/network_data.dart';
 
 class InstabugDioInterceptor extends Interceptor {
   static final Map<int, NetworkData> _requests = <int, NetworkData>{};
 
   @override
-  dynamic onRequest(RequestOptions options) {
-    final NetworkData data = NetworkData();
-    data.startTime = DateTime.now();
-    _requests[options.hashCode] = data;
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    final NetworkData networkData = NetworkData(
+        url: options.uri.toString(),
+        method: options.method,
+        startTime: DateTime.now());
+    _requests[options.hashCode] = networkData;
+    super.onRequest(options, handler);
   }
 
   @override
-  dynamic onResponse(Response response) {
-    NetworkLogger.networkLog(_map(response));
+  void onResponse(
+      Response<dynamic> response, ResponseInterceptorHandler handler) {
+    final NetworkData? networkData = _map(response);
+    _sendNetworkLog(networkData);
+    super.onResponse(response, handler);
   }
 
   @override
-  dynamic onError(DioError err) {
-    NetworkLogger.networkLog(_map(err.response));
+  void onError(DioError err, ErrorInterceptorHandler handler) {
+    if (err.response != null) {
+      final NetworkData? networkData = _map(err.response!);
+      _sendNetworkLog(networkData);
+    }
+    super.onError(err, handler);
   }
 
-  static NetworkData _getRequestData(int requestHashCode) {
+  NetworkData? _getRequestData(int requestHashCode) {
     if (_requests[requestHashCode] != null) {
       return _requests.remove(requestHashCode);
     }
     return null;
   }
 
-  NetworkData _map(Response response) {
-    final NetworkData data = _getRequestData(response.request.hashCode);
-    data.endTime = DateTime.now();
-    data.duration = data.endTime.millisecondsSinceEpoch -
-        data.startTime.millisecondsSinceEpoch;
+  void _sendNetworkLog(NetworkData? networkData) {
+    try {
+      if (networkData != null) {
+        NetworkLogger.networkLog(networkData);
+      }
+    } catch (_) {}
+  }
+
+  NetworkData? _map(Response<dynamic> response) {
+    final NetworkData? networkDataRequest =
+        _getRequestData(response.requestOptions.hashCode);
+    if (networkDataRequest == null) {
+      return null;
+    }
     final Map<String, dynamic> responseHeaders = <String, dynamic>{};
-    response.headers.forEach((name, value) => responseHeaders[name] = value);
-    data.url = response.request.uri.toString();
-    data.method = response.request.method;
-    data.requestBody = response.request.data;
-    data.requestHeaders = response.request.headers;
-    data.contentType = response.request.contentType.toString();
-    data.status = response.statusCode;
-    data.responseBody = response.data;
-    data.responseHeaders = responseHeaders;
-    return data;
+    response.headers
+        .forEach((String name, dynamic value) => responseHeaders[name] = value);
+    return networkDataRequest.copyWith(
+      endTime: DateTime.now(),
+      duration: networkDataRequest.endTime != null
+          ? networkDataRequest.endTime!.millisecondsSinceEpoch -
+              networkDataRequest.startTime.millisecondsSinceEpoch
+          : 0,
+      url: response.requestOptions.uri.toString(),
+      method: response.requestOptions.method,
+      requestBody: response.requestOptions.data.toString(),
+      requestHeaders: response.requestOptions.headers,
+      contentType: response.requestOptions.contentType,
+      status: response.statusCode,
+      responseBody: response.data.toString(),
+      responseHeaders: responseHeaders,
+    );
   }
 }

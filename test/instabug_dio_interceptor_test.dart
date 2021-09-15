@@ -1,50 +1,95 @@
 import 'package:dio/dio.dart';
-import 'package:mockito/mockito.dart';
-import 'package:instabug_dio_interceptor/instabug_dio_interceptor.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:instabug_dio_interceptor/instabug_dio_interceptor.dart';
+import 'package:instabug_flutter/Instabug.dart';
 
+import 'mock_adapter.dart';
 
-class MockInstabugDioInterceptor extends Mock implements InstabugDioInterceptor {}
+class MyInterceptor extends InstabugDioInterceptor {
+  int requestCount = 0;
+  int resposneCount = 0;
+  int errorCount = 0;
+
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+    requestCount++;
+    super.onRequest(options, handler);
+  }
+
+  @override
+  void onResponse(
+      Response<dynamic> response, ResponseInterceptorHandler handler) {
+    resposneCount++;
+    super.onResponse(response, handler);
+  }
+
+  @override
+  void onError(DioError err, ErrorInterceptorHandler handler) {
+    errorCount++;
+    super.onError(err, handler);
+  }
+}
 
 void main() {
-  test('onResponse Test', () async {
-    final MockInstabugDioInterceptor instabugDioInterceptor = MockInstabugDioInterceptor();
-    final Dio dio = Dio();
+  WidgetsFlutterBinding.ensureInitialized();
+  late Dio dio;
+  late MyInterceptor instabugDioInterceptor;
+  const String appToken = '068ba9a8c3615035e163dc5f829c73be';
+  setUpAll(() async {
+    const MethodChannel('instabug_flutter')
+        .setMockMethodCallHandler((MethodCall methodCall) async {
+      switch (methodCall.method) {
+        case 'getTags':
+          return <String>['tag1', 'tag2'];
+        default:
+          return null;
+      }
+    });
+  });
+  setUp(() {
+    dio = Dio();
+    dio.options.baseUrl = MockAdapter.mockBase;
+    dio.httpClientAdapter = MockAdapter();
+    final List<InvocationEvent> events = <InvocationEvent>[];
+    instabugDioInterceptor = MyInterceptor();
     dio.interceptors.add(instabugDioInterceptor);
-    when<dynamic>(instabugDioInterceptor.onRequest(any)).thenReturn(null);
-    when<dynamic>(instabugDioInterceptor.onResponse(any)).thenReturn(null);
+    Instabug.start(appToken, events);
+  });
+
+  test('onResponse Test', () async {
     try {
-      await dio.get<dynamic>("http://dummy.restapiexample.com/api/v1/employees");
-    } on DioError { }
-     verify<dynamic>(instabugDioInterceptor.onRequest(any));
-     verify<dynamic>(instabugDioInterceptor.onResponse(any));
+      await dio.get<dynamic>('/test');
+    } on DioError {
+      // ignor
+    }
+
+    expect(instabugDioInterceptor.requestCount, 1);
+    expect(instabugDioInterceptor.resposneCount, 1);
+    expect(instabugDioInterceptor.errorCount, 0);
   });
 
   test('onError Test', () async {
-    final MockInstabugDioInterceptor instabugDioInterceptor = MockInstabugDioInterceptor();
-    final Dio dio = Dio();
-    dio.interceptors.add(instabugDioInterceptor);
-    when<dynamic>(instabugDioInterceptor.onRequest(any)).thenReturn(null);
-    when<dynamic>(instabugDioInterceptor.onError(any)).thenReturn(null);
     try {
-      await dio.get<dynamic>("http://dummy.restapiexample.com/api/v1/employee");
-    } on DioError { }
-     verify<dynamic>(instabugDioInterceptor.onRequest(any));
-     verify<dynamic>(instabugDioInterceptor.onError(any));
+      await dio.get<dynamic>('/test-error');
+    } on DioError {
+      // ignor
+    }
+
+    expect(instabugDioInterceptor.requestCount, 1);
+    expect(instabugDioInterceptor.resposneCount, 0);
+    expect(instabugDioInterceptor.errorCount, 1);
   });
 
   test('Stress Test', () async {
-    final MockInstabugDioInterceptor instabugDioInterceptor = MockInstabugDioInterceptor();
-    final Dio dio = Dio();
-    dio.interceptors.add(instabugDioInterceptor);
-    when<dynamic>(instabugDioInterceptor.onRequest(any)).thenReturn(null);
-    when<dynamic>(instabugDioInterceptor.onResponse(any)).thenReturn(null);
     for (int i = 0; i < 1000; i++) {
       try {
-       dio.get<dynamic>("http://dummy.restapiexample.com/api/v1/employees");
-      } on DioError { }
+        await dio.get<dynamic>('/test');
+      } on DioError {
+        // ignor
+      }
     }
-     verify<dynamic>(instabugDioInterceptor.onRequest(any)).called(1000);
+    expect(instabugDioInterceptor.requestCount, 1000);
   });
 }
-
