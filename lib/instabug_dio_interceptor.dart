@@ -7,14 +7,17 @@ class InstabugDioInterceptor extends Interceptor {
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    final NetworkData data =
-        NetworkData(startTime: DateTime.now(), url: options.uri.toString(), method: options.method);
+    final NetworkData data = NetworkData(
+        startTime: DateTime.now(),
+        url: options.uri.toString(),
+        method: options.method);
     _requests[options.hashCode] = data;
     handler.next(options);
   }
 
   @override
-  void onResponse(Response<dynamic> response, ResponseInterceptorHandler handler) {
+  void onResponse(
+      Response<dynamic> response, ResponseInterceptorHandler handler) {
     final NetworkData data = _map(response);
     NetworkLogger.networkLog(data);
     handler.next(response);
@@ -31,18 +34,22 @@ class InstabugDioInterceptor extends Interceptor {
   }
 
   static NetworkData _getRequestData(int requestHashCode) {
-    final NetworkData d = _requests[requestHashCode]!;
+    final NetworkData data = _requests[requestHashCode]!;
     _requests.remove(requestHashCode);
-    return d;
+    return data;
   }
 
   NetworkData _map(Response<dynamic> response) {
     final NetworkData data = _getRequestData(response.requestOptions.hashCode);
     final Map<String, dynamic> responseHeaders = <String, dynamic>{};
-    response.headers.forEach((String name, dynamic value) => responseHeaders[name] = value);
+    response.headers
+        .forEach((String name, dynamic value) => responseHeaders[name] = value);
     return data.copyWith(
       endTime: DateTime.now(),
-      duration: data.endTime != null ? data.endTime!.millisecondsSinceEpoch - data.startTime.millisecondsSinceEpoch : 0,
+      duration: data.endTime != null
+          ? data.endTime!.millisecondsSinceEpoch -
+              data.startTime.millisecondsSinceEpoch
+          : 0,
       url: response.requestOptions.uri.toString(),
       method: response.requestOptions.method,
       requestBody: response.requestOptions.data.toString(),
