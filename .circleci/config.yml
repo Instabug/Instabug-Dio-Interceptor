@@ -2,7 +2,7 @@ version: 2
 jobs:
    test:
     docker:
-      - image: cirrusci/flutter
+      - image: cirrusci/flutter:2.2.3
     steps:
       - checkout
       - run: flutter doctor
@@ -12,7 +12,7 @@ jobs:
       
    release:
     docker:
-      - image: cirrusci/flutter
+      - image: cirrusci/flutter:2.2.3
     steps:
       - checkout
       - run: ./release.sh
