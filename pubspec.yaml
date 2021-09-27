@@ -11,7 +11,10 @@ dependencies:
   dio: ^4.0.0
   flutter:
     sdk: flutter
-  instabug_flutter: ^10.8.0
+  instabug_flutter:
+    git:
+      url: https://github.com/Instabug/instabug-flutter.git
+      ref: snapshot/10.8.0-android-plugin-v2
 dev_dependencies:
   flutter_test:
     sdk: flutter
