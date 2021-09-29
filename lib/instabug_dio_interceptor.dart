@@ -4,7 +4,7 @@ import 'package:instabug_flutter/NetworkLogger.dart';
 
 class InstabugDioInterceptor extends Interceptor {
   static final Map<int, NetworkData> _requests = <int, NetworkData>{};
-
+  
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     final NetworkData data = NetworkData(
@@ -42,12 +42,14 @@ class InstabugDioInterceptor extends Interceptor {
   NetworkData _map(Response<dynamic> response) {
     final NetworkData data = _getRequestData(response.requestOptions.hashCode);
     final Map<String, dynamic> responseHeaders = <String, dynamic>{};
+    final DateTime endTime = DateTime.now();
+
     response.headers
         .forEach((String name, dynamic value) => responseHeaders[name] = value);
     return data.copyWith(
-      endTime: DateTime.now(),
-      duration: data.endTime != null
-          ? data.endTime!.millisecondsSinceEpoch -
+      endTime: endTime,
+      duration: endTime != null
+          ? endTime.millisecondsSinceEpoch -
               data.startTime.millisecondsSinceEpoch
           : 0,
       url: response.requestOptions.uri.toString(),
