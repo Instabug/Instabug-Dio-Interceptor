@@ -1,3 +1,8 @@
+## v2.1.0 (2022-01-06)
+
+* Fixes network log compilation error.
+* Adds payload size for network log.
+
 ## v2.0.1 (2021-09-29)
 
 * Fixes an issue with APM network logger not reporting to the dashboard
