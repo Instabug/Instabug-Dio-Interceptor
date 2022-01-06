@@ -52,6 +52,21 @@ class InstabugDioInterceptor extends Interceptor {
       responseContentType = responseHeaders['content-type'].toString();
     }
 
+    int requestBodySize = 0;
+    if (response.requestOptions.headers.containsKey('content-length')) {
+      requestBodySize =
+          int.parse(response.requestOptions.headers['content-length'] ?? '0');
+    } else if (response.requestOptions.data != null) {
+      requestBodySize = response.requestOptions.data.toString().length;
+    }
+
+    int responseBodySize = 0;
+    if (responseHeaders.containsKey('content-length')) {
+      responseBodySize = int.parse(responseHeaders['content-length'][0] ?? '0');
+    } else if (response.data != null) {
+      responseBodySize = response.data.toString().length;
+    }
+
     return data.copyWith(
       endTime: endTime,
       duration: endTime.difference(data.startTime).inMicroseconds,
@@ -60,10 +75,12 @@ class InstabugDioInterceptor extends Interceptor {
       requestBody: response.requestOptions.data.toString(),
       requestHeaders: response.requestOptions.headers,
       requestContentType: response.requestOptions.contentType,
+      requestBodySize: requestBodySize,
       status: response.statusCode,
       responseBody: response.data.toString(),
       responseHeaders: responseHeaders,
       responseContentType: responseContentType,
+      responseBodySize: responseBodySize,
     );
   }
 }
