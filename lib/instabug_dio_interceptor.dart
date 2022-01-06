@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
-import 'package:instabug_flutter/models/network_data.dart';
 import 'package:instabug_flutter/NetworkLogger.dart';
+import 'package:instabug_flutter/models/network_data.dart';
 
 class InstabugDioInterceptor extends Interceptor {
   static final Map<int, NetworkData> _requests = <int, NetworkData>{};
-  
+  static final NetworkLogger _networklogger = NetworkLogger();
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     final NetworkData data = NetworkData(
@@ -19,7 +19,7 @@ class InstabugDioInterceptor extends Interceptor {
   void onResponse(
       Response<dynamic> response, ResponseInterceptorHandler handler) {
     final NetworkData data = _map(response);
-    NetworkLogger.networkLog(data);
+    _networklogger.networkLog(data);
     handler.next(response);
   }
 
@@ -27,7 +27,7 @@ class InstabugDioInterceptor extends Interceptor {
   void onError(DioError err, ErrorInterceptorHandler handler) {
     if (err.response != null) {
       final NetworkData data = _map(err.response!);
-      NetworkLogger.networkLog(data);
+      _networklogger.networkLog(data);
     }
 
     handler.next(err);
@@ -46,20 +46,41 @@ class InstabugDioInterceptor extends Interceptor {
 
     response.headers
         .forEach((String name, dynamic value) => responseHeaders[name] = value);
+
+    String responseContentType = '';
+    if (responseHeaders.containsKey('content-type')) {
+      responseContentType = responseHeaders['content-type'].toString();
+    }
+
+    int requestBodySize = 0;
+    if (response.requestOptions.headers.containsKey('content-length')) {
+      requestBodySize =
+          int.parse(response.requestOptions.headers['content-length'] ?? '0');
+    } else if (response.requestOptions.data != null) {
+      requestBodySize = response.requestOptions.data.toString().length;
+    }
+
+    int responseBodySize = 0;
+    if (responseHeaders.containsKey('content-length')) {
+      responseBodySize = int.parse(responseHeaders['content-length'][0] ?? '0');
+    } else if (response.data != null) {
+      responseBodySize = response.data.toString().length;
+    }
+
     return data.copyWith(
       endTime: endTime,
-      duration: endTime != null
-          ? endTime.millisecondsSinceEpoch -
-              data.startTime.millisecondsSinceEpoch
-          : 0,
+      duration: endTime.difference(data.startTime).inMicroseconds,
       url: response.requestOptions.uri.toString(),
       method: response.requestOptions.method,
       requestBody: response.requestOptions.data.toString(),
       requestHeaders: response.requestOptions.headers,
-      contentType: response.requestOptions.contentType,
+      requestContentType: response.requestOptions.contentType,
+      requestBodySize: requestBodySize,
       status: response.statusCode,
       responseBody: response.data.toString(),
       responseHeaders: responseHeaders,
+      responseContentType: responseContentType,
+      responseBodySize: responseBodySize,
     );
   }
 }
