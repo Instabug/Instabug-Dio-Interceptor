@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:instabug_dio_interceptor/instabug_dio_interceptor.dart';
-import 'package:instabug_flutter/Instabug.dart';
+import 'package:instabug_flutter/instabug_flutter.dart';
 
 import 'mock_adapter.dart';
 
