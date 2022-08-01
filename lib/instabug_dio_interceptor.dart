@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:instabug_flutter/NetworkLogger.dart';
-import 'package:instabug_flutter/models/network_data.dart';
+import 'package:instabug_flutter/instabug_flutter.dart';
 
 class InstabugDioInterceptor extends Interceptor {
   static final Map<int, NetworkData> _requests = <int, NetworkData>{};
