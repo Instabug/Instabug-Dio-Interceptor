@@ -1,6 +1,6 @@
-## v2.1.1 (2022-07-26)
+## v2.1.1 (2022-08-01)
 
-- Bump [instabug_flutter](https://pub.dev/packages/instabug_flutter) version to latest
+- Bumps [instabug_flutter](https://pub.dev/packages/instabug_flutter) to v11
 
 ## v2.1.0 (2022-01-06)
 
