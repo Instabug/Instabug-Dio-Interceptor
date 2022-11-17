@@ -1,3 +1,7 @@
+## Unreleased
+
+- Relaxes dependencies version constraints
+
 ## v2.1.1 (2022-08-01)
 
 - Bumps [instabug_flutter](https://pub.dev/packages/instabug_flutter) to v11
