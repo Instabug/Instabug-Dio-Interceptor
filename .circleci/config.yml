@@ -8,7 +8,7 @@ jobs:
       - run: flutter doctor
       - run: flutter pub get
       - run: flutter test
-      - run: dartanalyzer --options analysis_options.yaml --fatal-warnings lib
+      - run: flutter analyze .
       - run: flutter pub publish --dry-run
       
    release:
