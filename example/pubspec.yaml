@@ -12,7 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.2
-  dio: ^4.0.0
+  dio: ^5.0.0
   instabug_dio_interceptor:
     path: ../
 
