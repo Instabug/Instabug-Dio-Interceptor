@@ -56,7 +56,7 @@ void main() {
     final List<InvocationEvent> events = <InvocationEvent>[];
     instabugDioInterceptor = MyInterceptor();
     dio.interceptors.add(instabugDioInterceptor);
-    Instabug.start(appToken, events);
+    Instabug.init(token: appToken, invocationEvents: events);
   });
 
   test('onResponse Test', () async {
