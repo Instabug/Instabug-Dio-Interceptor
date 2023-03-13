@@ -6,11 +6,10 @@ import 'package:instabug_flutter/instabug_flutter.dart';
 Future<void> main() async {
   runApp(const MyApp());
 
-  Instabug.start(
-    'ed6f659591566da19b67857e1b9d40ab',
-    [InvocationEvent.floatingButton],
+  Instabug.init(
+    token: 'ed6f659591566da19b67857e1b9d40ab',
+    invocationEvents: [InvocationEvent.floatingButton],
   );
-  
 
   final dio = Dio()..interceptors.add(InstabugDioInterceptor());
   final response = await dio.get('https://google.com');
