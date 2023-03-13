@@ -1,10 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:instabug_dio_interceptor/instabug_dio_interceptor.dart';
 import 'package:instabug_flutter/instabug_flutter.dart';
+import 'package:instabug_flutter/src/generated/instabug.api.g.dart';
+import 'package:mockito/annotations.dart';
 
+import 'instabug_dio_interceptor_test.mocks.dart';
 import 'mock_adapter.dart';
 
 class MyInterceptor extends InstabugDioInterceptor {
@@ -32,23 +34,24 @@ class MyInterceptor extends InstabugDioInterceptor {
   }
 }
 
+@GenerateMocks(<Type>[
+  InstabugHostApi,
+])
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   WidgetsFlutterBinding.ensureInitialized();
+
+  final MockInstabugHostApi mHost = MockInstabugHostApi();
+
   late Dio dio;
   late MyInterceptor instabugDioInterceptor;
   const String appToken = '068ba9a8c3615035e163dc5f829c73be';
-  setUpAll(() async {
-    const MethodChannel('instabug_flutter')
-        .setMockMethodCallHandler((MethodCall methodCall) async {
-      switch (methodCall.method) {
-        case 'getTags':
-          return <String>['tag1', 'tag2'];
-        default:
-          return null;
-      }
-    });
+
+  setUpAll(() {
+    Instabug.$setHostApi(mHost);
+    NetworkLogger.$setHostApi(mHost);
   });
+
   setUp(() {
     dio = Dio();
     dio.options.baseUrl = MockAdapter.mockBase;
