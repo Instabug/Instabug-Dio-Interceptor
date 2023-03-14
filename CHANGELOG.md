@@ -1,4 +1,4 @@
-## Unreleased
+## v2.2.0 (2022-03-14)
 
 - Adds support for Dio v5
 - Relaxes dependencies version constraints
