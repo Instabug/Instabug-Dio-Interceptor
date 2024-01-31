@@ -9,7 +9,7 @@ environment:
   sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
-  dio: '>=4.0.0 <6.0.0'
+  dio: '>=5.2.0 <6.0.0'
   flutter:
     sdk: flutter
   instabug_flutter: '>=11.0.0 <13.0.0'

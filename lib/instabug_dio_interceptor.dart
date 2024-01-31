@@ -23,9 +23,7 @@ class InstabugDioInterceptor extends Interceptor {
   }
 
   @override
-  // Keep `DioError` instead of `DioException` for backward-compatibility, for now.
-  // ignore: deprecated_member_use
-  void onError(DioError err, ErrorInterceptorHandler handler) {
+  void onError(DioException err, ErrorInterceptorHandler handler) {
     if (err.response != null) {
       final NetworkData data = _map(err.response!);
       _networklogger.networkLog(data);
