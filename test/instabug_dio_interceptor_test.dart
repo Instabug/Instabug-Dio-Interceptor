@@ -28,8 +28,7 @@ class MyInterceptor extends InstabugDioInterceptor {
   }
 
   @override
-  // ignore: deprecated_member_use
-  void onError(DioError err, ErrorInterceptorHandler handler) {
+  void onError(DioException err, ErrorInterceptorHandler handler) {
     errorCount++;
     super.onError(err, handler);
   }
@@ -66,8 +65,7 @@ void main() {
   test('onResponse Test', () async {
     try {
       await dio.get<dynamic>('/test');
-      // ignore: deprecated_member_use
-    } on DioError {
+    } on DioException {
       // ignor
     }
 
@@ -79,8 +77,7 @@ void main() {
   test('onError Test', () async {
     try {
       await dio.get<dynamic>('/test-error');
-      // ignore: deprecated_member_use
-    } on DioError {
+    } on DioException {
       // ignor
     }
 
@@ -93,8 +90,7 @@ void main() {
     for (int i = 0; i < 1000; i++) {
       try {
         await dio.get<dynamic>('/test');
-        // ignore: deprecated_member_use
-      } on DioError {
+      } on DioException {
         // ignor
       }
     }

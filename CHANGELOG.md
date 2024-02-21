@@ -6,6 +6,10 @@
 
 - Add support for Instabug Flutter SDK v12 ([#26](https://github.com/Instabug/Instabug-Dio-Interceptor/pull/26)), closes [#25](https://github.com/Instabug/Instabug-Dio-Interceptor/issues/25).
 
+### Changed
+
+- **BREAKING:** Drop support for Dio versions before v5.2.0 to use `DioException` instead of the deprecated `DioError` ([#27](https://github.com/Instabug/Instabug-Dio-Interceptor/pull/27)).
+
 ## v2.2.0 (2022-03-14)
 
 - Adds support for Dio v5
