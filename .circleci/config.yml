@@ -13,9 +13,9 @@ jobs:
       - run: flutter pub publish --dry-run
       
    release:
-    docker:
+     docker:
       - image: cirrusci/flutter
-    steps:
+     steps:
       - checkout
       - run: ./release.sh
 
