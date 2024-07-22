@@ -4,10 +4,19 @@ import 'package:instabug_flutter/instabug_flutter.dart';
 class InstabugDioInterceptor extends Interceptor {
   static final Map<int, NetworkData> _requests = <int, NetworkData>{};
   static final NetworkLogger _networklogger = NetworkLogger();
+
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+  Future<void> onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+    final Map<String, dynamic> headers = options.headers;
+    final DateTime startTime = DateTime.now();
+    final String? w3Header =await  _networklogger.getW3Header(
+        headers, startTime.millisecondsSinceEpoch);
+    if(w3Header!=null){
+      headers['traceparent']=w3Header;
+    }
+    options.headers=headers;
     final NetworkData data = NetworkData(
-        startTime: DateTime.now(),
+        startTime: startTime,
         url: options.uri.toString(),
         method: options.method);
     _requests[options.hashCode] = data;
@@ -15,8 +24,8 @@ class InstabugDioInterceptor extends Interceptor {
   }
 
   @override
-  void onResponse(
-      Response<dynamic> response, ResponseInterceptorHandler handler) {
+  void onResponse(Response<dynamic> response,
+      ResponseInterceptorHandler handler) {
     final NetworkData data = _map(response);
     _networklogger.networkLog(data);
     handler.next(response);
@@ -58,19 +67,25 @@ class InstabugDioInterceptor extends Interceptor {
       requestBodySize =
           int.parse(response.requestOptions.headers['content-length'] ?? '0');
     } else if (response.requestOptions.data != null) {
-      requestBodySize = response.requestOptions.data.toString().length;
+      requestBodySize = response.requestOptions.data
+          .toString()
+          .length;
     }
 
     int responseBodySize = 0;
     if (responseHeaders.containsKey('content-length')) {
       responseBodySize = int.parse(responseHeaders['content-length'][0] ?? '0');
     } else if (response.data != null) {
-      responseBodySize = response.data.toString().length;
+      responseBodySize = response.data
+          .toString()
+          .length;
     }
 
     return data.copyWith(
       endTime: endTime,
-      duration: endTime.difference(data.startTime).inMicroseconds,
+      duration: endTime
+          .difference(data.startTime)
+          .inMicroseconds,
       url: response.requestOptions.uri.toString(),
       method: response.requestOptions.method,
       requestBody: response.requestOptions.data.toString(),

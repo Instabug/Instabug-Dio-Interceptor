@@ -15,7 +15,7 @@ class MyInterceptor extends InstabugDioInterceptor {
   int errorCount = 0;
 
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+  Future<void> onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
     requestCount++;
     super.onRequest(options, handler);
   }
