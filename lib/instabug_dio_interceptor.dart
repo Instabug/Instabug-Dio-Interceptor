@@ -9,7 +9,7 @@ class InstabugDioInterceptor extends Interceptor {
   Future<void> onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
     final Map<String, dynamic> headers = options.headers;
     final DateTime startTime = DateTime.now();
-    final String? w3Header =await  _networklogger.getW3Header(
+    final String? w3Header =await  _networklogger.getW3CHeader(
         headers, startTime.millisecondsSinceEpoch);
     if(w3Header!=null){
       headers['traceparent']=w3Header;
