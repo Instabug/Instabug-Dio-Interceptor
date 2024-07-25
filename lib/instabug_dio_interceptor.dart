@@ -6,26 +6,29 @@ class InstabugDioInterceptor extends Interceptor {
   static final NetworkLogger _networklogger = NetworkLogger();
 
   @override
-  Future<void> onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+  Future<void> onRequest(
+      RequestOptions options, RequestInterceptorHandler handler) async {
     final Map<String, dynamic> headers = options.headers;
     final DateTime startTime = DateTime.now();
-    final String? w3Header =await  _networklogger.getW3CHeader(
+    final w3Header = await _networklogger.getW3CHeader(
         headers, startTime.millisecondsSinceEpoch);
-    if(w3Header!=null){
-      headers['traceparent']=w3Header;
+    if (w3Header?.isW3cHeaderFound == false &&
+        w3Header?.w3CGeneratedHeader != null) {
+      headers['traceparent'] = w3Header?.w3CGeneratedHeader;
     }
-    options.headers=headers;
+    options.headers = headers;
     final NetworkData data = NetworkData(
         startTime: startTime,
         url: options.uri.toString(),
+        w3cHeader: w3Header,
         method: options.method);
     _requests[options.hashCode] = data;
     handler.next(options);
   }
 
   @override
-  void onResponse(Response<dynamic> response,
-      ResponseInterceptorHandler handler) {
+  void onResponse(
+      Response<dynamic> response, ResponseInterceptorHandler handler) {
     final NetworkData data = _map(response);
     _networklogger.networkLog(data);
     handler.next(response);
@@ -67,25 +70,19 @@ class InstabugDioInterceptor extends Interceptor {
       requestBodySize =
           int.parse(response.requestOptions.headers['content-length'] ?? '0');
     } else if (response.requestOptions.data != null) {
-      requestBodySize = response.requestOptions.data
-          .toString()
-          .length;
+      requestBodySize = response.requestOptions.data.toString().length;
     }
 
     int responseBodySize = 0;
     if (responseHeaders.containsKey('content-length')) {
       responseBodySize = int.parse(responseHeaders['content-length'][0] ?? '0');
     } else if (response.data != null) {
-      responseBodySize = response.data
-          .toString()
-          .length;
+      responseBodySize = response.data.toString().length;
     }
 
     return data.copyWith(
       endTime: endTime,
-      duration: endTime
-          .difference(data.startTime)
-          .inMicroseconds,
+      duration: endTime.difference(data.startTime).inMicroseconds,
       url: response.requestOptions.uri.toString(),
       method: response.requestOptions.method,
       requestBody: response.requestOptions.data.toString(),
