@@ -4,11 +4,24 @@ import 'package:instabug_flutter/instabug_flutter.dart';
 class InstabugDioInterceptor extends Interceptor {
   static final Map<int, NetworkData> _requests = <int, NetworkData>{};
   static final NetworkLogger _networklogger = NetworkLogger();
+
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+  Future<void> onRequest(
+      RequestOptions options, RequestInterceptorHandler handler) async {
+    final Map<String, dynamic> headers = options.headers;
+    final DateTime startTime = DateTime.now();
+    // ignore: invalid_use_of_internal_member
+    final W3CHeader? w3Header = await _networklogger.getW3CHeader(
+        headers, startTime.millisecondsSinceEpoch);
+    if (w3Header?.isW3cHeaderFound == false &&
+        w3Header?.w3CGeneratedHeader != null) {
+      headers['traceparent'] = w3Header?.w3CGeneratedHeader;
+    }
+    options.headers = headers;
     final NetworkData data = NetworkData(
-        startTime: DateTime.now(),
+        startTime: startTime,
         url: options.uri.toString(),
+        w3cHeader: w3Header,
         method: options.method);
     _requests[options.hashCode] = data;
     handler.next(options);
