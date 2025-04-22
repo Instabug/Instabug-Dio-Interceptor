@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.4.1] (2025-04-21)
+
+### Added
+- supports Dart versions above 3.0.0 ([#32](https://github.com/Instabug/Instabug-Dio-Interceptor/pull/32)).
+
 ## [2.4.0] (2024-11-18)
 
 ### Added
