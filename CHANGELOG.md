@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.5.0] (2025-07-17)
+
+### Added
+- supports Instabug SDK above 3.0.0 ([#34](https://github.com/Instabug/Instabug-Dio-Interceptor/pull/34)).
+
 ## [2.4.1] (2025-04-21)
 
 ### Added
